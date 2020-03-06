@@ -1,0 +1,5 @@
+CREATE OR REPLACE FUNCTION FN_EncodeInfo(info text) 
+RETURNS bytea AS
+$$
+	SELECT digest($1, 'sha256')
+$$ LANGUAGE SQL STRICT IMMUTABLE;
