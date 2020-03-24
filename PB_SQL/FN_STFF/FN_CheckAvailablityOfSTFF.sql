@@ -9,7 +9,28 @@ DECLARE
 	IsStffAvailable boolean := true;
 	CountOfIngredients integer := 0;
 	CountOfAvailableIngredients integer := 0;
+	TimeOfServer time;
+	TimeOfServerTimeWithoutUsing time;
 BEGIN
+	 TimeOfServer := NOW()-(
+	SELECT CL."ServeTime" + STFF_Temp."ServerTime"::interval
+		FROM "Cell" CL
+			INNER JOIN "Halfstuff" STFF
+		ON STFF."RefID" = CL."RefID"
+			INNER JOIN "HalfstuffTemplate" STFF_Temp
+		ON STFF_Temp."RefID" = CL."RefID"		
+	   	 	WHERE CL."RefID" = refid
+	);
+	
+	TimeOfServerTimeWithoutUsing := NOW()-(
+	SELECT CL."ServeTime" + STFF_Temp."ServeTimeWithoutUsing"::interval
+		FROM "Cell" CL
+			INNER JOIN "Halfstuff" STFF
+		ON STFF."RefID" = CL."RefID"
+			INNER JOIN "HalfstuffTemplate" STFF_Temp
+		ON STFF_Temp."RefID" = CL."RefID"		
+		  	WHERE CL."RefID" = refid	
+	);
 	
 	IF (stff_type = 'dough') THEN
 	
@@ -22,7 +43,7 @@ BEGIN
 			WHERE 
 				STFF."Balance" >= 1 AND
 				D."RefID" = refid
-			FOR UPDATE
+			
 		) > 0;
 	
 	ELSEIF (stff_type = 'additive') THEN
@@ -36,7 +57,7 @@ BEGIN
 			WHERE 
 				STFF."Balance" >= 1 AND
 				ADVE."RefID" = refid
-			FOR UPDATE
+			
 		) > 0;
 	
 	ELSEIF (stff_type = 'sauce') THEN
@@ -50,7 +71,7 @@ BEGIN
 			WHERE 
 				STFF."Balance" >= 1 AND
 				S."RefID" = refid
-			FOR UPDATE
+			
 		) > 0;
 	
 	ELSEIF (stff_type = 'filling') THEN
@@ -61,7 +82,7 @@ BEGIN
 			FROM "FillingRecipe" FLNG_R
 			WHERE
 				FLNG_R."FillingRefID" = reif
-			FOR UPDATE
+			
 		);
 		
 		CountOfAvailableIngredients := (
@@ -73,7 +94,7 @@ BEGIN
 			WHERE 
 				FLNG_R."FillingRefID" = refid AND
 				STFF."Balance" - FLNG_R."Balance" >= 0
-			FOR UPDATE
+			
 		);
 		
 		IsStffAvailable := (
@@ -90,7 +111,7 @@ BEGIN
 			WHERE 
 				STFF."Type" = 'paper' AND
 				STFF."Balance" >= 1
-			FOR UPDATE
+			
 		) > 0;
 	
 	END IF;
