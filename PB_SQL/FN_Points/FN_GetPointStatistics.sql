@@ -23,7 +23,8 @@ BEGIN
 		FROM "Order"
 		WHERE 
 			"State" != 'Ready' AND
-			date_part('day', "OrderDateTime") = date_part('day', NOW())
+			"OrderDateTime"::date = NOW()::date
+			
 	);
 	
 	numberoforderstoday := (
@@ -32,7 +33,7 @@ BEGIN
 		FROM "Order"
 		WHERE
 			"State" = 'Ready' AND
-			date_part('day', "OrderDateTime") = date_part('day', NOW())
+			"OrderDateTime"::date = NOW()::date
 	);
 	
 	numberoferrors := (
@@ -41,7 +42,7 @@ BEGIN
 		FROM "ClientSideLogs"
 		WHERE 
 			"IsError" = true AND
-			date_part('day', "created_dt") = date_part('day', NOW())
+			"created_dt"::date = NOW()::date
 	);
 	
 	numberofunavailabledishes := 
