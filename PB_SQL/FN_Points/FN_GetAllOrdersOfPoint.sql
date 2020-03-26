@@ -19,7 +19,7 @@ BEGIN
 		FROM "Order"
 		WHERE 
 			"State" != 'Ready' AND
-			date_part('day', "OrderDateTime") = date_part('day', NOW())
+			"OrderDateTime"::date = NOW()::date
 	);
 	
 	numberoforderstoday := (
@@ -28,7 +28,7 @@ BEGIN
 		FROM "Order"
 		WHERE
 			"State" = 'Ready' AND
-			date_part('day', "OrderDateTime") = date_part('day', NOW())
+			"OrderDateTime"::date = NOW()::date
 	);
 	
 	RETURN QUERY SELECT numberoforderstoday, numberofordersnow;
