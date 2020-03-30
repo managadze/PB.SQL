@@ -19,7 +19,7 @@ BEGIN
 		ON STFF."RefID" = CL."RefID"
 			INNER JOIN "HalfstuffTemplate" STFF_Temp
 		ON STFF_Temp."RefID" = CL."RefID"		
-	   	 	WHERE CL."RefID" = refid
+	   	 	WHERE  CL."RefID" = refid
 	);
 	
 	TimeOfServerTimeWithoutUsing := NOW()-(
@@ -29,7 +29,7 @@ BEGIN
 		ON STFF."RefID" = CL."RefID"
 			INNER JOIN "HalfstuffTemplate" STFF_Temp
 		ON STFF_Temp."RefID" = CL."RefID"		
-		  	WHERE CL."RefID" = refid	
+		  	WHERE  CL."RefID" = refid	
 	);
 	
 	IF (stff_type = 'dough') THEN
@@ -38,11 +38,13 @@ BEGIN
 			SELECT 
 				COUNT(1)
 			FROM "Dough" D
-				INNER JOIN "Halfstuff" STFF
+			INNER JOIN "Halfstuff" STFF
 					ON D."HalfstuffRefID" = STFF."RefID"
+			INNER JOIN "Cell" CL
+					ON D."RefID" = CL."RefID"
 			WHERE 
 				STFF."Balance" >= 1 AND
-				D."RefID" = refid
+				D."RefID" = refid 
 			
 		) > 0;
 	
@@ -54,6 +56,8 @@ BEGIN
 			FROM "Additive" ADVE
 				INNER JOIN "Halfstuff" STFF
 					ON ADVE."HalfstuffRefID" = STFF."RefID"
+			INNER JOIN "Cell" CL
+					ON ADVE."RefID" = CL."RefID"
 			WHERE 
 				STFF."Balance" >= 1 AND
 				ADVE."RefID" = refid
@@ -68,6 +72,8 @@ BEGIN
 			FROM "Sauce" S
 				INNER JOIN "Halfstuff" STFF
 					ON S."HalfstuffRefID" = STFF."RefID"
+			INNER JOIN "Cell" CL
+					ON S."RefID" = CL."RefID"
 			WHERE 
 				STFF."Balance" >= 1 AND
 				S."RefID" = refid
@@ -80,6 +86,8 @@ BEGIN
 			SELECT 
 				COUNT(1)
 			FROM "FillingRecipe" FLNG_R
+			INNER JOIN "Cell" CL
+					ON FLNG_R."FillingRefID" = CL."RefID"
 			WHERE
 				FLNG_R."FillingRefID" = reif
 			
