@@ -10,30 +10,43 @@ DECLARE
 	CountOfIngredients integer := 0;
 	CountOfAvailableIngredients integer := 0;
 	TimeOfServer time;
-	TimeOfServerTimeWithoutUsing time;
+	TimeOfServeWithoutUsing time;
 BEGIN
+	
+	IF (stff_type = 'dough') THEN
+	
 	 TimeOfServer := NOW()-(
 	SELECT CL."ServeTime" + STFF_Temp."ServerTime"::interval
 		FROM "Cell" CL
 			INNER JOIN "Halfstuff" STFF
 		ON STFF."RefID" = CL."RefID"
 			INNER JOIN "HalfstuffTemplate" STFF_Temp
-		ON STFF_Temp."RefID" = CL."RefID"		
-	   	 	WHERE  CL."RefID" = refid
+		ON STFF_Temp."RefID" = CL."RefID"		 
+		 	INNER JOIN "Dough" D
+		 ON D."HalfstuffRefID" = STFF."RefID"
+		 	WHERE D."RefID" = refid AND CL."RefID" = refid		 	
 	);
 	
-	TimeOfServerTimeWithoutUsing := NOW()-(
+	TimeOfServeWithoutUsing := NOW()-(
 	SELECT CL."ServeTime" + STFF_Temp."ServeTimeWithoutUsing"::interval
 		FROM "Cell" CL
 			INNER JOIN "Halfstuff" STFF
 		ON STFF."RefID" = CL."RefID"
 			INNER JOIN "HalfstuffTemplate" STFF_Temp
 		ON STFF_Temp."RefID" = CL."RefID"		
-		  	WHERE  CL."RefID" = refid	
+		    INNER JOIN "Dough" D
+	    ON D."HalfstuffRefID" = STFF."RefID"
+		 	WHERE D."RefID" = refid	AND CL."RefID" = refid
 	);
 	
-	IF (stff_type = 'dough') THEN
+	IF (TimeOfServer < TimeOfServeWithoutUsing)
+		THEN  TimeOfServer := TimeServer;
+	END IF;
 	
+	IF (TimeOfServer > TimeOfServeWithoutUsing)
+		THEN  TimeOfServeWithoutUsing := TimeOfServeWithoutUsing;
+	END IF;
+		
 		IsStffAvailable = (
 			SELECT 
 				COUNT(1)
@@ -50,6 +63,38 @@ BEGIN
 	
 	ELSEIF (stff_type = 'additive') THEN
 	
+	 TimeOfServer := NOW()-(
+	SELECT CL."ServeTime" + STFF_Temp."ServerTime"::interval
+		FROM "Cell" CL
+			INNER JOIN "Halfstuff" STFF
+		ON STFF."RefID" = CL."RefID"
+			INNER JOIN "HalfstuffTemplate" STFF_Temp
+		ON STFF_Temp."RefID" = CL."RefID"		 
+		 	INNER JOIN "Additive" ADVE
+		 ON ADVE."HalfstuffRefID" = STFF."RefID"
+		 	WHERE ADVE."RefID" = refid AND CL."RefID" = refid		 	
+	);
+	
+	TimeOfServeWithoutUsing := NOW()-(
+	SELECT CL."ServeTime" + STFF_Temp."ServeTimeWithoutUsing"::interval
+		FROM "Cell" CL
+			INNER JOIN "Halfstuff" STFF
+		ON STFF."RefID" = CL."RefID"
+			INNER JOIN "HalfstuffTemplate" STFF_Temp
+		ON STFF_Temp."RefID" = CL."RefID"		
+		    INNER JOIN "Additive" ADVE
+	    ON ADVE."HalfstuffRefID" = STFF."RefID"
+		 	WHERE ADVE."RefID" = refid	AND CL."RefID" = refid
+	);
+	
+	IF (TimeOfServer < TimeOfServeWithoutUsing)
+		THEN  TimeOfServer := TimeServer;
+	END IF;
+	
+	IF (TimeOfServer > TimeOfServeWithoutUsing)
+		THEN  TimeOfServeWithoutUsing := TimeOfServeWithoutUsing;
+	END IF;
+	
 		IsStffAvailable = (
 			SELECT 
 				COUNT(1)
@@ -65,6 +110,38 @@ BEGIN
 		) > 0;
 	
 	ELSEIF (stff_type = 'sauce') THEN
+	
+	 TimeOfServer := NOW()-(
+	SELECT CL."ServeTime" + STFF_Temp."ServerTime"::interval
+		FROM "Cell" CL
+			INNER JOIN "Halfstuff" STFF
+		ON STFF."RefID" = CL."RefID"
+			INNER JOIN "HalfstuffTemplate" STFF_Temp
+		ON STFF_Temp."RefID" = CL."RefID"		 
+		 	INNER JOIN "Sauce" S
+		 ON S."HalfstuffRefID" = STFF."RefID"
+		 	WHERE S."RefID" = refid AND CL."RefID" = refid		 	
+	);
+	
+	TimeOfServeWithoutUsing := NOW()-(
+	SELECT CL."ServeTime" + STFF_Temp."ServeTimeWithoutUsing"::interval
+		FROM "Cell" CL
+			INNER JOIN "Halfstuff" STFF
+		ON STFF."RefID" = CL."RefID"
+			INNER JOIN "HalfstuffTemplate" STFF_Temp
+		ON STFF_Temp."RefID" = CL."RefID"		
+		    INNER JOIN "Sauce" S
+	    ON S."HalfstuffRefID" = STFF."RefID"
+		 	WHERE S."RefID" = refid	AND CL."RefID" = refid
+	);
+	
+	IF (TimeOfServer < TimeOfServeWithoutUsing)
+		THEN  TimeOfServer := TimeServer;
+	END IF;
+	
+	IF (TimeOfServer > TimeOfServeWithoutUsing)
+		THEN  TimeOfServeWithoutUsing := TimeOfServeWithoutUsing;
+	END IF;
 	
 		IsStffAvailable = (
 			SELECT 
