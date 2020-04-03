@@ -1,6 +1,6 @@
-DROP FUNCTION IF EXISTS FN_CheckAvailablityOfSTFF;
+DROP FUNCTION IF EXISTS FN_CheckAvailablityOfDishPart;
 
-CREATE OR REPLACE FUNCTION FN_CheckAvailablityOfSTFF(
+CREATE OR REPLACE FUNCTION FN_CheckAvailablityOfDishPart(
 	stff_type character varying,
 	refid uuid
 ) RETURNS boolean AS
@@ -24,7 +24,7 @@ BEGIN
 		ON STFF_Temp."RefID" = CL."RefID"		 
 		 	INNER JOIN "Dough" D
 		 ON D."HalfstuffRefID" = STFF."RefID"
-		 	WHERE D."RefID" = refid AND CL."RefID" = refid		 	
+		 	WHERE D."RefID" = refid AND IsStffAvailable = true		 	
 	);
 	
 	TimeOfServeWithoutUsing := NOW()-(
@@ -36,15 +36,19 @@ BEGIN
 		ON STFF_Temp."RefID" = CL."RefID"		
 		    INNER JOIN "Dough" D
 	    ON D."HalfstuffRefID" = STFF."RefID"
-		 	WHERE D."RefID" = refid	AND CL."RefID" = refid
+		 	WHERE D."RefID" = refid	AND IsStffAvailable = true	
 	);
 	
-	IF (TimeOfServer < TimeOfServeWithoutUsing)
-		THEN  TimeOfServer := TimeServer;
+	IF (TimeOfServeWithoutUsing < TimeServer)
+		THEN  TimeOfServer := TimeOfServeWithoutUsing;
 	END IF;
 	
-	IF (TimeOfServer > TimeOfServeWithoutUsing)
-		THEN  TimeOfServeWithoutUsing := TimeOfServeWithoutUsing;
+	IF (TimeOfServer < 0 )
+		THEN  RETURN false; 
+	END IF;
+	
+	IF (TimeOfServer > 0)
+		THEN RETURN true;
 	END IF;
 		
 		IsStffAvailable = (
@@ -72,7 +76,7 @@ BEGIN
 		ON STFF_Temp."RefID" = CL."RefID"		 
 		 	INNER JOIN "Additive" ADVE
 		 ON ADVE."HalfstuffRefID" = STFF."RefID"
-		 	WHERE ADVE."RefID" = refid AND CL."RefID" = refid		 	
+		 	WHERE ADVE."RefID" = refid 	AND IsStffAvailable = true		 	
 	);
 	
 	TimeOfServeWithoutUsing := NOW()-(
@@ -84,15 +88,19 @@ BEGIN
 		ON STFF_Temp."RefID" = CL."RefID"		
 		    INNER JOIN "Additive" ADVE
 	    ON ADVE."HalfstuffRefID" = STFF."RefID"
-		 	WHERE ADVE."RefID" = refid	AND CL."RefID" = refid
+		 	WHERE ADVE."RefID" = refid	AND IsStffAvailable = true	
 	);
 	
-	IF (TimeOfServer < TimeOfServeWithoutUsing)
-		THEN  TimeOfServer := TimeServer;
+	IF (TimeOfServeWithoutUsing < TimeServer)
+		THEN  TimeOfServer := TimeOfServeWithoutUsing;
 	END IF;
 	
-	IF (TimeOfServer > TimeOfServeWithoutUsing)
-		THEN  TimeOfServeWithoutUsing := TimeOfServeWithoutUsing;
+	IF (TimeOfServer < 0 )
+		THEN  RETURN false;
+	END IF;
+	
+	IF (TimeOfServer > 0)
+		THEN RETURN true;
 	END IF;
 	
 		IsStffAvailable = (
@@ -120,7 +128,7 @@ BEGIN
 		ON STFF_Temp."RefID" = CL."RefID"		 
 		 	INNER JOIN "Sauce" S
 		 ON S."HalfstuffRefID" = STFF."RefID"
-		 	WHERE S."RefID" = refid AND CL."RefID" = refid		 	
+		 	WHERE S."RefID" = refid AND IsStffAvailable = true		 	
 	);
 	
 	TimeOfServeWithoutUsing := NOW()-(
@@ -132,15 +140,19 @@ BEGIN
 		ON STFF_Temp."RefID" = CL."RefID"		
 		    INNER JOIN "Sauce" S
 	    ON S."HalfstuffRefID" = STFF."RefID"
-		 	WHERE S."RefID" = refid	AND CL."RefID" = refid
+		 	WHERE S."RefID" = refid	AND IsStffAvailable = true	
 	);
 	
-	IF (TimeOfServer < TimeOfServeWithoutUsing)
-		THEN  TimeOfServer := TimeServer;
+	IF (TimeOfServeWithoutUsing < TimeServer)
+		THEN  TimeOfServer := TimeOfServeWithoutUsing;
 	END IF;
 	
-	IF (TimeOfServer > TimeOfServeWithoutUsing)
-		THEN  TimeOfServeWithoutUsing := TimeOfServeWithoutUsing;
+	IF (TimeOfServer < 0 )
+		THEN  RETURN false;
+	END IF;
+	
+	IF (TimeOfServer > 0)
+		THEN RETURN true;
 	END IF;
 	
 		IsStffAvailable = (
@@ -166,7 +178,7 @@ BEGIN
 			INNER JOIN "Cell" CL
 					ON FLNG_R."FillingRefID" = CL."RefID"
 			WHERE
-				FLNG_R."FillingRefID" = reif
+				FLNG_R."FillingRefID" = reif AND IsStffAvailable = true	
 			
 		);
 		
@@ -204,7 +216,6 @@ BEGIN
 	RETURN IsStffAvailable;
 
 END $$ LANGUAGE 'plpgsql';
-
 
 
 
