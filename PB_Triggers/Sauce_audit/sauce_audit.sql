@@ -1,0 +1,5 @@
+DROP TRIGGER IF EXISTS sauce_audit ON "Sauce";
+
+CREATE TRIGGER sauce_audit
+BEFORE UPDATE OR DELETE ON "Sauce"
+FOR EACH ROW EXECUTE PROCEDURE process_sauce_audit();

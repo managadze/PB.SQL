@@ -1,0 +1,5 @@
+DROP TRIGGER IF EXISTS order_audit ON "Order";
+
+CREATE TRIGGER order_audit
+BEFORE UPDATE OR DELETE ON "Order"
+FOR EACH ROW EXECUTE PROCEDURE process_order_audit();

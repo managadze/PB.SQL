@@ -1,0 +1,5 @@
+DROP TRIGGER IF EXISTS dish_audit ON "Dish";
+
+CREATE TRIGGER dish_audit
+BEFORE UPDATE OR DELETE ON "Dish"
+FOR EACH ROW EXECUTE PROCEDURE process_dish_audit();
