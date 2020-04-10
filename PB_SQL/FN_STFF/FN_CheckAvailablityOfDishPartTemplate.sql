@@ -1,6 +1,6 @@
-DROP FUNCTION IF EXISTS FN_CheckAvailablityOfSTFF;
+DROP FUNCTION IF EXISTS FN_CheckAvailablityOfDishPartTemplate;
 
-CREATE OR REPLACE FUNCTION FN_CheckAvailablityOfSTFF(
+CREATE OR REPLACE FUNCTION FN_CheckAvailablityOfDishPartTemplate(
 	stff_type character varying,
 	refid uuid
 ) RETURNS boolean AS
