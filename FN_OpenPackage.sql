@@ -1,1 +1,22 @@
-PB.SQL
+DROP FUNCTION IF EXISTS FN_OpenPackage
+
+CREATE OR REPLACE FUNCTION FN_OpenPackage(
+cell_name varchar
+)
+RETURNS boolean
+AS
+$$ BEGIN
+UPDATE "Cell" CLL
+	SET CLL."IsOpen" = TRUE
+	WHERE CLL."Code" = cell_name;
+COMMIT;
+RETURN TRUE;
+EXCEPTION
+	WHEN OTHER THEN
+	BEGIN
+		ROLLBACK;
+		RETURN FALSE;
+	END;
+END $$ LANGUAGE 'plpgsql';
+
+SELECT FN_OpenPackage('B2_D4');
